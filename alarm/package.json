@@ -1,0 +1,13 @@
+{
+  "name": "alarm",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "react-native start"
+  },
+  "dependencies": {
+    "react-native": "^0.18.0-rc",
+    "react-native-date": "^1.0.2",
+    "react-native-icons": "^0.7.0"
+  }
+}
