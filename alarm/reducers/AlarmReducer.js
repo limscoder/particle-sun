@@ -1,4 +1,5 @@
 import {
+  REVIVE_ALARMS,
   ADD_ALARM,
   REMOVE_ALARM,
   TOGGLE_ALARM,
@@ -20,6 +21,10 @@ const initialAlarm = {
     6: true
   }
 };
+
+function onReviveAlarms(state, { payload }) {
+  return payload || initialState;
+}
 
 function onAddAlarm(state, { payload }) {
   return {
@@ -78,6 +83,7 @@ function onToggleDay(state, { payload }) {
 }
 
 const actionMap = {
+  [REVIVE_ALARMS]: onReviveAlarms,
   [ADD_ALARM]: onAddAlarm,
   [REMOVE_ALARM]: onRemoveAlarm,
   [TOGGLE_ALARM]: onToggleAlarm,

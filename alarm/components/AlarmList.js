@@ -12,7 +12,7 @@ const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 export default class AlarmList extends Component {
   static propTypes = {
     items: PropTypes.array.isRequired,
-    onRemoveAlarm: PropTypes.array.isRequired,
+    onRemoveAlarm: PropTypes.func.isRequired,
     onToggleAlarm: PropTypes.func.isRequired,
     onToggleDay: PropTypes.func.isRequired
   };

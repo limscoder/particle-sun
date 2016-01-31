@@ -22,15 +22,15 @@ export default class Alarm extends Component {
 
     return (
         <View style={ alarmStyle }>
-          <View style={ styles.alarmTop }>
-            <View style={ styles.alarmLeft }>
+          <View key="top" style={ styles.alarmTop }>
+            <View key="left" style={ styles.alarmLeft }>
               { this._renderTime() }
             </View>
-            <View style={ styles.alarmRight }>
+            <View key="right" style={ styles.alarmRight }>
               { this._renderSwitch() }
             </View>
           </View>
-          <View style={ styles.alarmBottom }>
+          <View key="bottom" style={ styles.alarmBottom }>
             { this._renderDays() }
             { this._renderDelete() }
           </View>
@@ -40,7 +40,7 @@ export default class Alarm extends Component {
 
   _renderSwitch = () => {
     return (
-      <View style={ styles.alarmSwitch }>
+      <View key="switch" style={ styles.alarmSwitch }>
         <Switch value={ this.props.item.enabled }
                 onValueChange={ this._onToggle }/>
       </View>
@@ -56,11 +56,11 @@ export default class Alarm extends Component {
     const clockPm = isPm ? 'pm' : 'am';
 
     return (
-      <View style={ styles.clock }>
-        <Text style={ styles.clockTime }>
+      <View key="clockTime" style={ styles.clock }>
+        <Text key="time" style={ styles.clockTime }>
           { clockTime }
         </Text>
-        <Text style={ styles.clockPm }>
+        <Text key="pm" style={ styles.clockPm }>
           { clockPm }
         </Text>
       </View>
@@ -76,7 +76,9 @@ export default class Alarm extends Component {
       const textStyle = isActive ? styles.activeDayText : styles.inactiveDayText;
 
       return (
-        <TouchableOpacity style={ dayStyle } onPress={ () => this._onToggleDay(idx) }>
+        <TouchableOpacity key={ `day:${idx}`}
+                          style={ dayStyle }
+                          onPress={ () => this._onToggleDay(idx) }>
           <Text style={ textStyle }>
             { day }
           </Text>
@@ -87,7 +89,8 @@ export default class Alarm extends Component {
 
   _renderDelete = () => {
     return (
-      <TouchableOpacity style={ styles.deleteAlarm }
+      <TouchableOpacity key="delete"
+                        style={ styles.deleteAlarm }
                         onPress={ this._onRemove}>
         <Icon name='fontawesome|trash-o'
               size={ 32 }

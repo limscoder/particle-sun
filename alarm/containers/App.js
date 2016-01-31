@@ -1,4 +1,5 @@
 import React, {
+  AsyncStorage,
   Component,
   PropTypes,
   NativeModules,
@@ -6,8 +7,8 @@ import React, {
 } from 'react-native';
 import { connect, Provider } from 'react-redux/native';
 import { createStore, applyMiddleware, bindActionCreators } from 'redux';
-import thunkMiddleware from 'redux-thunk';
 import {
+  reviveAlarms,
   addAlarm,
   removeAlarm,
   toggleAlarm,
@@ -19,8 +20,9 @@ import AlarmList from '../components/AlarmList';
 import AddButton from '../components/AddButton';
 import * as styles from '../components/styles';
 
-const createStoreWithMiddleware = applyMiddleware(thunkMiddleware)(createStore);
-const store = createStoreWithMiddleware(AlarmReducer);
+const store = createStore(AlarmReducer);
+
+const storageKey = 'AlarmState';
 
 function mapStateToProps(state) {
   return state;
@@ -28,6 +30,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
+    reviveAlarms: reviveAlarms,
     onAddAlarm: addAlarm,
     onRemoveAlarm: removeAlarm,
     onToggleAlarm: toggleAlarm,
@@ -43,6 +46,18 @@ class App extends Component {
     onToggleAlarm: PropTypes.func.isRequired,
     onToggleDay: PropTypes.func.isRequired
   };
+
+  constructor(props) {
+    super(props);
+
+    AsyncStorage.getItem(storageKey).then((state) => {
+      props.reviveAlarms(JSON.parse(state));
+
+      store.subscribe(() => {
+        AsyncStorage.setItem(storageKey, JSON.stringify(store.getState()));
+      });
+    });
+  }
 
   render() {
     return (
