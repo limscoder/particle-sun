@@ -11,7 +11,10 @@ import * as styles from './styles.js';
 
 export default class Alarm extends Component {
   static propTypes = {
-    item: PropTypes.object.isRequired
+    item: PropTypes.object.isRequired,
+    onRemove: PropTypes.func.isRequired,
+    onToggle: PropTypes.func.isRequired,
+    onToggleDay: PropTypes.func.isRequired
   };
 
   render() {
@@ -38,7 +41,8 @@ export default class Alarm extends Component {
   _renderSwitch = () => {
     return (
       <View style={ styles.alarmSwitch }>
-        <Switch value={ this.props.item.enabled } />
+        <Switch value={ this.props.item.enabled }
+                onValueChange={ this._onToggle }/>
       </View>
     );
   };
@@ -67,12 +71,12 @@ export default class Alarm extends Component {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     return days.map((day, idx) => {
-      const isActive = this.props.item.days.indexOf(idx) > -1;
+      const isActive = this.props.item.days[idx];
       const dayStyle = isActive ? styles.activeDay : styles.inactiveDay;
       const textStyle = isActive ? styles.activeDayText : styles.inactiveDayText;
 
       return (
-        <TouchableOpacity style={ dayStyle }>
+        <TouchableOpacity style={ dayStyle } onPress={ () => this._onToggleDay(idx) }>
           <Text style={ textStyle }>
             { day }
           </Text>
@@ -83,11 +87,24 @@ export default class Alarm extends Component {
 
   _renderDelete = () => {
     return (
-      <TouchableOpacity style={ styles.deleteAlarm }>
+      <TouchableOpacity style={ styles.deleteAlarm }
+                        onPress={ this._onRemove}>
         <Icon name='fontawesome|trash-o'
               size={ 32 }
               style={ styles.icon } />
       </TouchableOpacity>
     );
+  };
+
+  _onRemove = () => {
+    this.props.onRemove(this.props.item.id);
+  };
+
+  _onToggle = () => {
+    this.props.onToggle(this.props.item.id);
+  };
+
+  _onToggleDay = (dayId) => {
+    this.props.onToggleDay(this.props.item.id, dayId);
   };
 }

@@ -109,14 +109,13 @@ export const inactiveDay = {
 
 const dayText = {
   marginTop: 6,
-  marginLeft: 4,
+  textAlign: 'center',
   fontWeight: 'bold'
 };
 
 export const activeDayText = {
   ...dayText,
-  color: backgroundColor,
-  marginLeft: 2,
+  color: backgroundColor
 };
 
 export const inactiveDayText = {

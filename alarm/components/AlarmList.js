@@ -1,5 +1,6 @@
 import React, {
   Component,
+  PropTypes,
   Text,
   ListView
 } from 'react-native';
@@ -7,16 +8,26 @@ import Alarm from './Alarm';
 import * as styles from './styles.js';
 
 const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-const sampleAlarm = {
-  time: 1035,
-  enabled: true,
-  days: [1, 2, 3, 4]
-};
 
 export default class AlarmList extends Component {
+  static propTypes = {
+    items: PropTypes.array.isRequired,
+    onRemoveAlarm: PropTypes.array.isRequired,
+    onToggleAlarm: PropTypes.func.isRequired,
+    onToggleDay: PropTypes.func.isRequired
+  };
+
   render() {
     return <ListView style={ styles.alarmList }
-                     dataSource={ ds.cloneWithRows([sampleAlarm]) }
-                     renderRow={ (item) => <Alarm item={ item } /> }/>;
+                     dataSource={ ds.cloneWithRows(this.props.items) }
+                     renderRow={ this._renderAlarm }/>;
   }
+
+  _renderAlarm = (item) => {
+    return <Alarm key={ item.id }
+                  item={ item }
+                  onRemove={ this.props.onRemoveAlarm }
+                  onToggle={ this.props.onToggleAlarm }
+                  onToggleDay={ this.props.onToggleDay } />
+  };
 }
