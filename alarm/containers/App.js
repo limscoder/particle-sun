@@ -1,4 +1,9 @@
-import React, { Component, PropTypes, View } from 'react-native';
+import React, {
+  Component,
+  PropTypes,
+  NativeModules,
+  View
+} from 'react-native';
 import { connect, Provider } from 'react-redux/native';
 import { createStore, applyMiddleware, bindActionCreators } from 'redux';
 import thunkMiddleware from 'redux-thunk';
@@ -23,7 +28,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return bindActionCreators({
-    onAddAlarm: () => addAlarm(1035),
+    onAddAlarm: addAlarm,
     onRemoveAlarm: removeAlarm,
     onToggleAlarm: toggleAlarm,
     onToggleDay: toggleDay
@@ -46,10 +51,17 @@ class App extends Component {
                    onRemoveAlarm={ this.props.onRemoveAlarm }
                    onToggleAlarm={ this.props.onToggleAlarm }
                    onToggleDay={ this.props.onToggleDay } />
-        <AddButton onPress={ this.props.onAddAlarm }/>
+        <AddButton onPress={ this._onAddAlarm }/>
       </View>
     );
   }
+
+  _onAddAlarm = () => {
+    NativeModules.DateAndroid.showTimepicker(() => {}, (hour, minute) => {
+      const minutes = (hour * 60) + minute;
+      this.props.onAddAlarm(minutes);
+    });
+  };
 };
 const ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(App);
 

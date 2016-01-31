@@ -3,8 +3,7 @@ import React, {
   PropTypes,
   Text,
   TouchableOpacity,
-  View,
-  NativeModules
+  View
 } from 'react-native';
 import * as styles from './styles';
 

@@ -8,7 +8,7 @@
   "dependencies": {
     "react": "^0.14.6",
     "react-native": "^0.18.0-rc",
-    "react-native-date": "^1.0.2",
+    "react-native-date": "^1.0.3",
     "react-native-icons": "^0.7.0",
     "react-redux": "^3.1.2",
     "redux": "^3.0.5",

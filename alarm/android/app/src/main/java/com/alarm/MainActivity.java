@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.smixx.reactnativeicons.ReactNativeIcons;
+import me.nucleartux.date.ReactDatePackage;
 
 public class MainActivity extends ReactActivity {
 
@@ -37,6 +38,7 @@ public class MainActivity extends ReactActivity {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
         new MainReactPackage(),
-        new ReactNativeIcons());
+        new ReactNativeIcons(),
+        new ReactDatePackage(this));
     }
 }
