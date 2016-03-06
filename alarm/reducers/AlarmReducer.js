@@ -82,6 +82,49 @@ function onToggleDay(state, { payload }) {
   };
 }
 
+function getUTCTime(day, minutes) {
+  const maxMinutes = 24 * 60;
+  const offset = new Date().getTimezoneOffset();
+  let offsetTime;
+  if (offset < 0) {
+    offsetTime = minutes + offset;
+    if (offsetTime < 0) {
+      day -= 1;
+      offsetTime = maxMinutes + offsetTime;
+    }
+  } else {
+    offsetTime = offset + minutes;
+    if (offsetTime > maxMinutes) {
+      day += 1;
+      offsetTime -= maxMinutes;
+    }
+  }
+
+  if (day > 6) {
+    day = 0;
+  }
+
+  if (day < 0) {
+    day = 6;
+  }
+
+  return {
+    day: (day + 1),
+    seconds: (offsetTime * 60)
+  };
+}
+
+function getAlarmTimeString(alarm) {
+  return Object.keys(alarm.days).reduce((acc, day) => {
+    if (alarm.days[day]) {
+      const utcTime = getUTCTime(parseInt(day, 10), alarm.time);
+      acc.push(utcTime.day.toString());
+      acc.push(utcTime.seconds.toString());
+    }
+    return acc;
+  }, []);
+}
+
 const actionMap = {
   [REVIVE_ALARMS]: onReviveAlarms,
   [ADD_ALARM]: onAddAlarm,
@@ -96,4 +139,13 @@ export default function(state = initialState, action) {
   }
 
   return state;
+}
+
+export function getTimeString(state) {
+  return state.alarms.reduce((acc, alarm) => {
+    if (alarm.enabled) {
+      return acc.concat(getAlarmTimeString(alarm));
+    }
+    return acc;
+  }, []).join('-');
 }

@@ -6,7 +6,11 @@ import React, {
   View
 } from 'react-native';
 import { connect, Provider } from 'react-redux/native';
-import { createStore, applyMiddleware, bindActionCreators } from 'redux';
+import {
+  createStore,
+  applyMiddleware,
+  bindActionCreators
+} from 'redux';
 import {
   reviveAlarms,
   addAlarm,
@@ -14,13 +18,17 @@ import {
   toggleAlarm,
   toggleDay
 } from '../actions/AlarmActions';
+import { setTime } from '../api/api';
 
-import AlarmReducer from '../reducers/AlarmReducer';
+import AlarmReducer, { getTimeString } from '../reducers/AlarmReducer';
 import AlarmList from '../components/AlarmList';
 import AddButton from '../components/AddButton';
 import * as styles from '../components/styles';
 
 const store = createStore(AlarmReducer);
+store.subscribe(() => {
+  setTime(getTimeString(store.getState()));
+});
 
 const storageKey = 'AlarmState';
 

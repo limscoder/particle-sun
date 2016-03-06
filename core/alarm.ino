@@ -9,22 +9,26 @@ char message[64];
 
 int setAlarmTimes(String command);
 
+void debug(String message, int value) {
+    char msg [50];
+    sprintf(msg, message.c_str(), value);
+    Spark.publish("DEBUG", msg);
+}
+
 void setup()
 {
     pinMode(ledOut, OUTPUT);
     pinMode(buzzerOut, OUTPUT);
-    
-    pinMode(buttonIn, INPUT_PULLDOWN); 
-    
+
+    pinMode(buttonIn, INPUT_PULLDOWN);
+
     digitalWrite(ledOut, LOW);
     digitalWrite(buzzerOut, LOW);
     attachInterrupt(buttonIn, onButton, RISING);
-    
-    setAlarmTimes(String("2:200"));
+
+    alarmDisabledTime = Time.now();
+
     Particle.function("alarmTime", setAlarmTimes);
-    
-    // int now = Time.now();
-    // alarmDisabledTime = now;
 }
 
 void loop()
@@ -75,7 +79,7 @@ int getSecondsPastAlarm(int alarmTime) {
     if (alarmIsActive) {
         return getSecondsFromStartOfDay(now) - alarmTime;
     }
-    
+
     return -1;
 }
 
@@ -124,17 +128,17 @@ void alarmIfActive(int day, int alarmTime) {
 }
 
 void alarmIfTimesAreActive() {
-    const char alarmSeparator[2] = ":";
+    const char alarmSeparator[2] = "-";
     char alarmString[512];
     strcpy(alarmString, alarmTimes);
-    
+
     bool isDay = true;
     char *token = NULL;
     char *dayToken = NULL;
     char *secondsToken = NULL;
     int day = 0;
     int seconds = 0;
-    
+
     token = strtok(alarmString, alarmSeparator);
     while(token != NULL) {
         if (isDay) {
@@ -142,21 +146,22 @@ void alarmIfTimesAreActive() {
             isDay = false;
         } else {
             secondsToken = token;
-            // TODO: input validation
             day = strtol(dayToken, NULL, 10);
             seconds = strtol(secondsToken, NULL, 10);
             alarmIfActive(day, seconds);
+            isDay = true;
         }
-        
+
         token = strtok(NULL, alarmSeparator);
     }
 }
 
 int setAlarmTimes(String command) {
     if (command.length() < 512) {
+        // TODO: input validation
         command.toCharArray(alarmTimes, 512);
         return 1;
     }
-    
+
     return -1;
 }
