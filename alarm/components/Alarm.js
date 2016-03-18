@@ -27,12 +27,12 @@ export default class Alarm extends Component {
               { this._renderTime() }
             </View>
             <View key="right" style={ styles.alarmRight }>
+              { this._renderDelete() }
               { this._renderSwitch() }
             </View>
           </View>
           <View key="bottom" style={ styles.alarmBottom }>
             { this._renderDays() }
-            { this._renderDelete() }
           </View>
         </View>
     );

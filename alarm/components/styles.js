@@ -64,7 +64,8 @@ export const alarmLeft = {};
 
 export const alarmRight = {
   alignItems: 'flex-end',
-  flex: 1
+  flex: 1,
+  flexDirection: 'row'
 };
 
 export const alarmBottom = {
@@ -126,7 +127,8 @@ export const inactiveDayText = {
 export const deleteAlarm = {
   flex: 1,
   flexDirection: 'row',
-  justifyContent: 'flex-end'
+  justifyContent: 'flex-end',
+  marginRight: 10
 };
 
 export const icon = {
