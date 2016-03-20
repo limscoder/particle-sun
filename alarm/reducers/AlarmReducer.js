@@ -3,7 +3,8 @@ import {
   ADD_ALARM,
   REMOVE_ALARM,
   TOGGLE_ALARM,
-  TOGGLE_DAY
+  TOGGLE_DAY,
+  UPDATE_ALARM
 } from '../actions/ActionTypes';
 
 const initialState = {
@@ -21,6 +22,16 @@ const initialAlarm = {
     6: true
   }
 };
+
+function updateAlarmWithId(state, alarmId, func) {
+  return state.alarms.map((item) => {
+    if (item.id === alarmId) {
+      return func(item);
+    }
+
+    return item;
+  });
+}
 
 function onReviveAlarms(state, { payload }) {
   return payload || initialState;
@@ -50,15 +61,11 @@ function onRemoveAlarm(state, { payload }) {
 function onToggleAlarm(state, { payload }) {
   return {
     ...state,
-    alarms: state.alarms.map((item) => {
-      if (item.id === payload) {
-        return {
-          ...item,
-          enabled: !item.enabled
-        };
-      }
-
-      return item;
+    alarms: updateAlarmWithId(state, payload, (item) => {
+      return {
+        ...item,
+        enabled: !item.enabled
+      };
     })
   };
 }
@@ -66,18 +73,26 @@ function onToggleAlarm(state, { payload }) {
 function onToggleDay(state, { payload }) {
   return {
     ...state,
-    alarms: state.alarms.map((item) => {
-      if (item.id === payload.alarmId) {
-        return {
-          ...item,
-          days: {
-            ...item.days,
-            [payload.dayId]: (!item.days[payload.dayId])
-          }
-        };
-      }
+    alarms: updateAlarmWithId(state, payload.alarmId, (item) => {
+      return {
+        ...item,
+        days: {
+          ...item.days,
+          [payload.dayId]: (!item.days[payload.dayId])
+        }
+      };
+    })
+  };
+}
 
-      return item;
+function onUpdateAlarm(state, { payload }) {
+  return {
+    ...state,
+    alarms: updateAlarmWithId(state, payload.alarmId, (item) => {
+      return {
+        ...item,
+        time: payload.time
+      };
     })
   };
 }
@@ -130,7 +145,8 @@ const actionMap = {
   [ADD_ALARM]: onAddAlarm,
   [REMOVE_ALARM]: onRemoveAlarm,
   [TOGGLE_ALARM]: onToggleAlarm,
-  [TOGGLE_DAY]: onToggleDay
+  [TOGGLE_DAY]: onToggleDay,
+  [UPDATE_ALARM]: onUpdateAlarm
 };
 
 export default function(state = initialState, action) {

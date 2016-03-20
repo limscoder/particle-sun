@@ -16,7 +16,8 @@ import {
   addAlarm,
   removeAlarm,
   toggleAlarm,
-  toggleDay
+  toggleDay,
+  updateAlarm
 } from '../actions/AlarmActions';
 import { setTime } from '../api/api';
 
@@ -40,6 +41,7 @@ function mapDispatchToProps(dispatch) {
   return bindActionCreators({
     reviveAlarms: reviveAlarms,
     onAddAlarm: addAlarm,
+    onAlarmUpdate: updateAlarm,
     onRemoveAlarm: removeAlarm,
     onToggleAlarm: toggleAlarm,
     onToggleDay: toggleDay
@@ -50,6 +52,7 @@ class App extends Component {
   static propTypes = {
     alarms: PropTypes.array.isRequired,
     onAddAlarm: PropTypes.func.isRequired,
+    onAlarmUpdate: PropTypes.func.isRequire,
     onRemoveAlarm: PropTypes.func.isRequired,
     onToggleAlarm: PropTypes.func.isRequired,
     onToggleDay: PropTypes.func.isRequired
@@ -71,6 +74,7 @@ class App extends Component {
     return (
       <View style={ styles.app } elevation={ 1 }>
         <AlarmList items={ this.props.alarms }
+                   onAlarmTimePress={ this._onAlarmTimePress }
                    onRemoveAlarm={ this.props.onRemoveAlarm }
                    onToggleAlarm={ this.props.onToggleAlarm }
                    onToggleDay={ this.props.onToggleDay } />
@@ -83,6 +87,24 @@ class App extends Component {
     NativeModules.DateAndroid.showTimepicker(() => {}, (hour, minute) => {
       const minutes = (hour * 60) + minute;
       this.props.onAddAlarm(minutes);
+    });
+  };
+
+  _onAlarmTimePress = (alarmId) => {
+    const currentAlarm = this.props.alarms.filter((alarm) => alarm.id === alarmId)[0];
+    const currentHours = Math.floor(currentAlarm.time / 60);
+    const currentMinutes = currentAlarm.time % 60;
+    const initialTime = new Date();
+    initialTime.setHours(currentHours);
+    initialTime.setMinutes(currentMinutes);
+    initialTime.setSeconds(0);
+    const initialTimeIso = initialTime.toISOString();
+
+    NativeModules.DateAndroid.showTimepickerWithInitialTime(initialTimeIso,
+      () => {},
+      (hour, minute) => {
+        const minutes = (hour * 60) + minute;
+        this.props.onAlarmUpdate(alarmId, minutes);
     });
   };
 };

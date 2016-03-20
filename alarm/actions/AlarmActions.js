@@ -3,7 +3,8 @@ import {
   ADD_ALARM,
   REMOVE_ALARM,
   TOGGLE_ALARM,
-  TOGGLE_DAY
+  TOGGLE_DAY,
+  UPDATE_ALARM
 } from './ActionTypes';
 
 export function reviveAlarms(state) {
@@ -40,6 +41,16 @@ export function toggleDay(alarmId, dayId) {
     payload: {
       alarmId,
       dayId
+    }
+  };
+}
+
+export function updateAlarm(alarmId, time) {
+  return {
+    type: UPDATE_ALARM,
+    payload: {
+      alarmId,
+      time
     }
   };
 }

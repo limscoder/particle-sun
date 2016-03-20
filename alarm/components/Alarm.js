@@ -13,6 +13,7 @@ export default class Alarm extends Component {
   static propTypes = {
     item: PropTypes.object.isRequired,
     onRemove: PropTypes.func.isRequired,
+    onTimePress: PropTypes.func.isRequired,
     onToggle: PropTypes.func.isRequired,
     onToggleDay: PropTypes.func.isRequired
   };
@@ -52,18 +53,21 @@ export default class Alarm extends Component {
     const isPm = twentyFourHours > 12;
     const twelveHours = isPm ? twentyFourHours - 12 : twentyFourHours;
     const minutes = this.props.item.time % 60;
-    const clockTime = `${twelveHours}:${minutes}`;
+    const minuteString = minutes > 9 ? minutes.toString() : '0' + minutes.toString();
+    const clockTime = `${twelveHours}:${minuteString}`;
     const clockPm = isPm ? 'pm' : 'am';
 
     return (
-      <View key="clockTime" style={ styles.clock }>
-        <Text key="time" style={ styles.clockTime }>
-          { clockTime }
-        </Text>
-        <Text key="pm" style={ styles.clockPm }>
-          { clockPm }
-        </Text>
-      </View>
+      <TouchableOpacity onPress={ this._onTimePress }>
+        <View key="clockTime" style={ styles.clock }>
+          <Text key="time" style={ styles.clockTime }>
+            { clockTime }
+          </Text>
+          <Text key="pm" style={ styles.clockPm }>
+            { clockPm }
+          </Text>
+        </View>
+      </TouchableOpacity>
     );
   };
 
@@ -97,6 +101,10 @@ export default class Alarm extends Component {
               style={ styles.icon } />
       </TouchableOpacity>
     );
+  };
+
+  _onTimePress = () => {
+    this.props.onTimePress(this.props.item.id);
   };
 
   _onRemove = () => {
