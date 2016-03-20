@@ -1,4 +1,3 @@
-// This #include statement was automatically added by the Particle IDE.
 #include "InternetButton/InternetButton.h"
 #include "math.h"
 
@@ -16,11 +15,12 @@ char alarmTimes[512] = "";
 
 int alarmDuration = 300;
 int riseDuration = floor(alarmDuration * .18);
-int greenDuration = floor(alarmDuration * .22);
-int blueDuration = floor(alarmDuration * .22);
-int whiteDuration = floor(alarmDuration * .18);
+int greenDuration = floor(alarmDuration * .33);
+int blueDuration = floor(alarmDuration * .13);
+int whiteDuration = floor(alarmDuration * .15);
 int blinkDuration = floor(alarmDuration *.09);
 int blinkFastDuration = floor(alarmDuration * .09);
+int buzzDuration = 60 * 5;
 
 InternetButton b = InternetButton();
 
@@ -35,6 +35,9 @@ void setup() {
     attachInterrupt(button3, onButton, FALLING);
     attachInterrupt(button4, onButton, FALLING);
     Particle.function("alarmTime", setAlarmTimes);
+
+    RGB.control(true);
+    RGB.brightness(0);
 }
 
 void loop() {
@@ -45,12 +48,17 @@ void onButton() {
     if (millis() - lastButtonPress > 300) { // debounce
         lastButtonPress = millis();
         if (alarmIsActive) {
-            alarmIsActive = false;
-            alarmDisabledTime = Time.now();
+            disableAlarm();
         } else {
             toggleLight();
         }
     }
+}
+
+void disableAlarm() {
+    alarmIsActive = false;
+    alarmDisabledTime = Time.now();
+    b.allLedsOff();
 }
 
 void toggleLight() {
@@ -78,8 +86,12 @@ void animateAlarm(int secondsPastAlarm) {
     int blinkStart = whiteStart + whiteDuration;
     int blinkFastStart = blinkStart + blinkDuration;
     int buzzStart = blinkFastStart + blinkFastDuration;
+    int alarmTimeout = buzzStart + buzzDuration;
 
-    if (secondsPastAlarm > buzzStart) {
+    if (secondsPastAlarm > alarmTimeout) {
+        // way past alarm, turn off
+        b.allLedsOff();
+    } else if (secondsPastAlarm > buzzStart) {
         animateBuzz();
     } else if (secondsPastAlarm > blinkFastStart) {
         animateBlink(750, 500);
@@ -140,20 +152,26 @@ void animateRise(int animationSeconds) {
     if (animationSeconds > (frameTime * 4)) {
         b.ledOn(1, red, green, blue);
         b.ledOn(11, red, green, blue);
-    } else if (animationSeconds > (frameTime * 3)) {
+    }
+
+    if (animationSeconds > (frameTime * 3)) {
         b.ledOn(2, red, green, blue);
         b.ledOn(10, red, green, blue);
-    } else if (animationSeconds > (frameTime * 2)) {
+    }
+
+    if (animationSeconds > (frameTime * 2)) {
         b.ledOn(3, red, green, blue);
         b.ledOn(9, red, green, blue);
-    } else if (animationSeconds > frameTime) {
+    }
+
+    if (animationSeconds > frameTime) {
         b.ledOn(4, red, green, blue);
         b.ledOn(8, red, green, blue);
-    } else {
-        b.ledOn(5, red, green, blue);
-        b.ledOn(6, red, green, blue);
-        b.ledOn(7, red, green, blue);
     }
+
+    b.ledOn(5, red, green, blue);
+    b.ledOn(6, red, green, blue);
+    b.ledOn(7, red, green, blue);
 }
 
 bool isSameDay(int firstTime, int secondTime) {
