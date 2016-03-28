@@ -10,7 +10,11 @@ bool lightIsOn = false;
 bool alarmIsActive = false;
 int alarmDisabledTime = 0;
 int ledCount = 12;
+int syncTimeInterval = 60 * 20 * 1000;
+int lastTimeSync = 0;
 int lastButtonPress = 0;
+int alarmCheckInterval = 10 * 1000;
+int lastAlarmCheck = 0;
 char alarmTimes[512] = "";
 
 int alarmDuration = 300;
@@ -42,11 +46,33 @@ void setup() {
 
 void loop() {
     alarmIfTimesAreActive();
+    syncTime();
+}
+
+void checkAlarm() {
+    int currentMillis = millis();
+    int lastCheckMillis = currentMillis - lastAlarmCheck;
+    if (alarmIsActive || lastCheckMillis < 0 || lastCheckMillis > alarmCheckInterval) {
+        lastCheckMillis = currentMillis;
+        alarmIfTimesAreActive();
+    }
+}
+
+void syncTime() {
+    if (!alarmIsActive) {
+        int currentMillis = millis();
+        int lastSyncMillis = currentMillis - lastTimeSync;
+        if (lastSyncMillis < 0 || lastSyncMillis > syncTimeInterval) {
+            lastTimeSync = currentMillis;
+            Particle.syncTime();
+        }
+    }
 }
 
 void onButton() {
-    if (millis() - lastButtonPress > 300) { // debounce
-        lastButtonPress = millis();
+    int currentMillis = millis();
+    if (currentMillis - lastButtonPress > 300) { // debounce
+        lastButtonPress = currentMillis;
         if (alarmIsActive) {
             disableAlarm();
         } else {
@@ -187,8 +213,8 @@ int getSecondsFromStartOfDay(int epochTime) {
 int getSecondsPastAlarm(int alarmTime) {
     int now = Time.now();
     int alarmDisabledToday = isSameDay(alarmDisabledTime, now) ? getSecondsFromStartOfDay(alarmDisabledTime) : 0;
-    int alarmIsActive = alarmDisabledToday < alarmTime;
-    if (alarmIsActive) {
+    int alarmIsDisabled = alarmDisabledToday > alarmTime;
+    if (!alarmIsDisabled) {
         return getSecondsFromStartOfDay(now) - alarmTime;
     }
 
@@ -198,9 +224,14 @@ int getSecondsPastAlarm(int alarmTime) {
 void alarmIfActive(int day, int alarmTime) {
     if (day == Time.weekday()) {
         int secondsPastAlarm = getSecondsPastAlarm(alarmTime);
-        alarmIsActive = secondsPastAlarm > 0;
-        if (alarmIsActive) {
+        if (secondsPastAlarm > 0) {
+            alarmIsActive = true;
             animateAlarm(secondsPastAlarm);
+        } else {
+            alarmIsActive = false;
+            if (!lightIsOn) {
+                b.allLedsOff();
+            }
         }
     }
 }
